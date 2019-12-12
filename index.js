@@ -1,11 +1,10 @@
 const http = require('http');
 const https = require('https');
 const colors = require('colors/safe');
+const fs = require("fs");
 
-global.statusFailed = 0;
-
-const status = (arraySites) => {
-    console.time('#forEach');
+const status = async (arraySites) => {
+    //console.time('#forEach');
 
     var arrayJson = JSON.parse(arraySites);
 
@@ -19,7 +18,8 @@ const status = (arraySites) => {
             method = https;
         }
 
-        const request = method.get(website.url, (resp) => {
+        //Método asyncrono
+        method.get(website.url, (resp) => {
 
             const { statusCode } = resp;
 
@@ -34,8 +34,15 @@ const status = (arraySites) => {
                 data += chunk;
             });
 
-
             resp.on('end', () => {
+                if (statusCode !== 200 && status !== 301) {
+                    var data = new Date();
+                    var statusText = "\n" + data
+                    statusText += "\n" + "Nome: " + website.nome + "\n" + "Url: " + website.url + "\n" + "Responsável: " + website.responsavel + "\n" + "Status: " + statusCode + "\n"
+
+                    fs.appendFileSync('C:\\Users\\Matheus Castro\\Desktop\\verify-websites\\errors.txt', statusText);
+
+                }
 
                 //console.log(resp.statusCode);
 
@@ -43,32 +50,40 @@ const status = (arraySites) => {
                 // console.log(data);
 
                 //Retorna o status HTTP
+
                 console.log('');
                 console.log('Nome: ' + website.nome);
                 console.log('Url: ' + website.url);
                 console.log('Responsável: ' + website.responsavel);
-                console.log('Status: ' + statusCode);
+                console.log('STATUS: ' + colors.green(statusCode));
                 console.log('');
                 //console.log(contentType);
             });
 
         }).on("error", (err) => {
 
+            var data = new Date();
+
+            var statusText = "\n" + data
+            statusText += "\n" + "Nome: " + website.nome + "\n" + "Url: " + website.url + "\n" + "Responsável: " + website.responsavel + "\n" + "Status: " + err.message + "\n"
+
+            fs.appendFileSync('C:\\Users\\Matheus Castro\\Desktop\\verify-websites\\errors.txt', statusText);
+
+
             //Retorna o status HTTP
             console.log('');
             console.log('Nome: ' + website.nome);
             console.log('Url: ' + website.url);
             console.log('Responsável: ' + website.responsavel);
-            console.log('Status: ' + colors.red(err.message));
+            console.log('STATUS: ' + colors.red(err.message));
             console.log('');
             //console.log(contentType);
         });
 
-        console.log(global.statusFailed)
 
-        request.end();
     })
-    console.timeEnd('#forEach');
+    //console.timeEnd('#forEach');
 }
+
 
 module.exports = { status }

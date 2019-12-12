@@ -12,11 +12,7 @@ const status = async (arraySites) => {
 
         var protocol = website.url.split(':');
 
-        if (protocol[0] === 'http') {
-            method = http;
-        } else {
-            method = https;
-        }
+        var method = protocol[0] === 'http' ? http : https;
 
         //Método asyncrono
         method.get(website.url, (resp) => {
@@ -37,10 +33,10 @@ const status = async (arraySites) => {
             resp.on('end', () => {
                 if (statusCode !== 200 && status !== 301) {
                     var data = new Date();
+
                     var statusText = "\n" + data
                     statusText += "\n" + "Nome: " + website.nome + "\n" + "Url: " + website.url + "\n" + "Responsável: " + website.responsavel + "\n" + "Status: " + statusCode + "\n"
-
-                    fs.appendFileSync('C:\\Users\\Matheus Castro\\Desktop\\verify-websites\\errors.txt', statusText);
+                    fs.appendFileSync('errors.txt', statusText);
 
                 }
 
@@ -67,7 +63,7 @@ const status = async (arraySites) => {
             var statusText = "\n" + data
             statusText += "\n" + "Nome: " + website.nome + "\n" + "Url: " + website.url + "\n" + "Responsável: " + website.responsavel + "\n" + "Status: " + err.message + "\n"
 
-            fs.appendFileSync('C:\\Users\\Matheus Castro\\Desktop\\verify-websites\\errors.txt', statusText);
+            fs.appendFileSync('errors.txt', statusText);
 
 
             //Retorna o status HTTP
